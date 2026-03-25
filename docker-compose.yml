@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: planillas-liceo-app
+    container_name: planillas_liceo_app
+    restart: unless-stopped
+    ports:
+      # Mapeamos el puerto 8080 del VPS al 80 del contenedor. 
+      # Puedes cambiar el '8080' por el que gustes (ej. 80:80 si no hay otros sitios web).
+      - "8080:80"
+    environment:
+      # Fuerzas ciertas variables para producción, aunque leera del .env también.
+      - APP_ENV=production
+      - APP_DEBUG=false
+    env_file:
+      - .env
+    volumes:
+      # Montamos la carpeta de almacenamiento de forma persistente
+      # para evitar perder imágenes/archivos que los usuarios suban.
+      - ./storage:/var/www/html/storage
+    depends_on:
+      - db
+    networks:
+      - planillas_network
+
+  db:
+    image: mysql:8.0
+    container_name: planillas_liceo_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: "${DB_DATABASE}"
+      MYSQL_USER: "${DB_USERNAME}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}" # Para simplificar, usamos la misma contraseña como root.
+    volumes:
+      - db_data:/var/lib/mysql
+      # Esto es MAGIA: como vi que tienes `planillas_liceo.sql` en tu carpeta, 
+      # Docker lo usará automáticamente para restaurar la BD la primera vez que arranque.
+      - ./planillas_liceo.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - planillas_network
+
+networks:
+  planillas_network:
+    driver: bridge
+
+volumes:
+  # Volumen persistente para que la base de datos no se borre al reiniciar el contenedor.
+  db_data:
