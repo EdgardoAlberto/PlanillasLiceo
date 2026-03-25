@@ -1,0 +1,41 @@
+
+  Dropping all tables . 380ms DONE
+
+   INFO  Preparing database.  
+
+  Creating migration table  11ms DONE
+
+   INFO  Running migrations.  
+
+  2014_10_11_000000_create_roles_table  27ms DONE
+  2014_10_12_000000_create_users_table  77ms DONE
+  2014_10_12_100000_create_password_reset_tokens_table  9ms DONE
+  2019_08_19_000000_create_failed_jobs_table  27ms DONE
+  2019_12_14_000001_create_personal_access_tokens_table  36ms DONE
+  2026_03_18_190423_create_payroll_levels_table  27ms DONE
+  2026_03_18_190424_create_deduction_types_table  8ms DONE
+  2026_03_18_190424_create_employees_table  81ms DONE
+  2026_03_18_190425_create_payrolls_table  204ms DONE
+  2026_03_18_190426_create_payroll_detail_deductions_table  39ms FAIL
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[HY000]: General error: 1005 Can't create table `planillas_liceo`.`payroll_detail_deductions` (errno: 150 "Foreign key constraint is incorrectly formed") (Connection: mysql, SQL: alter table `payroll_detail_deductions` add constraint `payroll_detail_deductions_payroll_detail_id_foreign` foreign key (`payroll_detail_id`) references `payroll_details` (`id`) on delete cascade)
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:829
+    825▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    826▕                 );
+    827▕             }
+    828▕ 
+  ➜ 829▕             throw new QueryException(
+    830▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    831▕             );
+    832▕         }
+    833▕     }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:587
+      PDOException::("SQLSTATE[HY000]: General error: 1005 Can't create table `planillas_liceo`.`payroll_detail_deductions` (errno: 150 "Foreign key constraint is incorrectly formed")")
+
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:587
+      PDOStatement::execute()
+

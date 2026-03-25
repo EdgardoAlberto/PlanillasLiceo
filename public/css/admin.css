@@ -1,0 +1,110 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f7f6;
+    overflow-x: hidden;
+}
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: #112D4E; /* Azul oscuro corporativo */
+    color: #fff;
+    transition: all 0.3s;
+    min-height: 100vh;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+#sidebar.active {
+    margin-left: -250px;
+}
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: #198754; /* Verde principal */
+}
+#sidebar ul.components {
+    padding: 20px 0;
+}
+#sidebar ul li a {
+    padding: 12px 20px;
+    font-size: 1.05em;
+    display: block;
+    color: #DBE2EF;
+    text-decoration: none;
+    transition: 0.2s;
+}
+#sidebar ul li a:hover {
+    color: #112D4E;
+    background: #DBE2EF;
+}
+#sidebar ul li.active > a, 
+#sidebar ul li a[aria-expanded="true"] {
+    background: #FFC107; /* Amarillo resaltado */
+    color: #112D4E;
+    font-weight: 600;
+}
+#sidebar ul ul a {
+    font-size: 0.95em !important;
+    padding-left: 45px !important;
+    background: #0D223B;
+}
+#content {
+    width: 100%;
+    min-height: 100vh;
+    transition: all 0.3s;
+    background-color: #f8f9fa;
+}
+/* Theme Button */
+.btn-theme {
+    background-color: #198754;
+    border-color: #198754;
+    color: white;
+}
+.btn-theme:hover {
+    background-color: #146c43;
+    border-color: #146c43;
+    color: white;
+}
+.btn-warning-theme {
+    background-color: #FFC107;
+    color: #112D4E;
+    font-weight: bold;
+}
+/* Cards */
+.kpi-card {
+    border-radius: 8px;
+    border: none;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+    border-left: 5px solid #198754; /* Verde */
+}
+.kpi-card.blue-edge { border-left-color: #112D4E; }
+.kpi-card.yellow-edge { border-left-color: #FFC107; }
+
+.kpi-card:hover {
+    transform: translateY(-5px);
+}
+.kpi-icon {
+    font-size: 2.5rem;
+    color: #198754;
+    opacity: 0.8;
+}
+/* Custom Table styling */
+.table-theme {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.table-theme thead {
+    background: #112D4E;
+    color: #fff;
+}
+.table-theme th {
+    font-weight: 500;
+    border: none;
+}

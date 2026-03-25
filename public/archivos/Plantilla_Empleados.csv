@@ -1,0 +1,4 @@
+codigo_empleado,identidad,nombres,apellidos,numero_ihss,banco,cuenta_bancaria,correo,departamento,sueldo_base,telefono,fecha_contratacion
+EMP-001,0801-1990-12345,Juan Carlos,Perez Mendoza,12345678,Banco Atlantida,123456789,juan@ejemplo.com,SECUNDARIA,15000.00,99887766,2023-01-15
+EMP-002,0501-1985-54321,Maria Elena,Martinez Diaz,,Ficohsa,098765432,maria@ejemplo.com,PRE-BASICA,14000.00,88776655,2024-02-01
+EMP-003,0801-1992-11111,Carlos Jose,Rodriguez,,,,ADMINISTRACION Y APOYO,18000.00,,2021-06-10
