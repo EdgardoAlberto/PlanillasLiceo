@@ -50,6 +50,14 @@
                     </select>
                 </div>
                 <div class="col-md-3">
+                    <label class="form-label">Sub-categoría (Solo Apoyo/Admin)</label>
+                    <select name="support_category" class="form-select">
+                        <option value="">Ninguna</option>
+                        <option value="Administración" {{ old('support_category') == 'Administración' ? 'selected' : '' }}>Administración</option>
+                        <option value="Apoyo" {{ old('support_category') == 'Apoyo' ? 'selected' : '' }}>Apoyo</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <label class="form-label">Sueldo Base (L.) *</label>
                     <input type="number" step="0.01" name="base_salary" class="form-control" value="{{ old('base_salary') }}" required>
                 </div>

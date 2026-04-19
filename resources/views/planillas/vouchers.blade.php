@@ -36,7 +36,13 @@
     </div>
 
     <div style="padding: 0 15px;">
-    @foreach($planilla->details->sortBy(function($d) { return $d->employee->first_name . ' ' . $d->employee->last_name; })->values() as $idx => $detail)
+    @foreach($planilla->details->sortBy(function($d) { 
+        $prefix = '';
+        if ($d->employee->support_category === 'Administración') $prefix = '1_';
+        elseif ($d->employee->support_category === 'Apoyo') $prefix = '2_';
+        else $prefix = '3_';
+        return $prefix . $d->employee->first_name . ' ' . $d->employee->last_name; 
+    })->values() as $idx => $detail)
         @php
             $nombre = strtoupper($detail->employee->first_name . ' ' . $detail->employee->last_name);
             $salario = number_format($detail->base_salary, 2);
@@ -47,7 +53,8 @@
         <div style="width: 100%;">
             <!-- COPIA 1 (Izquierda) -->
             <div class="voucher-container">
-                <div class="header-title">
+                <div class="header-title" style="position: relative; margin-bottom: 25px; min-height: 1.2cm;">
+                    <img src="{{ asset('img/logo.png') }}" style="max-height: 1.2cm; max-width: 1.2cm; position: absolute; left: 0; top: -5px;">
                     INSTITUTO SAGRADO CORAZON (L.H.)<br>
                     COMPROBANTE DE PAGO
                 </div>
@@ -89,7 +96,8 @@
 
             <!-- COPIA 2 (Derecha - Idéntica) -->
             <div class="voucher-container right">
-                <div class="header-title">
+                <div class="header-title" style="position: relative; margin-bottom: 25px; min-height: 1.2cm;">
+                    <img src="{{ asset('img/logo.png') }}" style="max-height: 1.2cm; max-width: 1.2cm; position: absolute; left: 0; top: -5px;">
                     INSTITUTO SAGRADO CORAZON (L.H.)<br>
                     COMPROBANTE DE PAGO
                 </div>

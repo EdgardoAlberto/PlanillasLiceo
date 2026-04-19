@@ -4,11 +4,38 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="h4 text-secondary mb-0">Resumen General</h2>
-    <span class="text-muted">{{ now()->translatedFormat('d \d\e F, Y') }}</span>
+    <div class="d-flex align-items-center">
+        <form id="filterForm" class="me-3 mb-0">
+            <select name="period" class="form-select form-select-sm" onchange="applyFilter(this.value)">
+                <option value="">Todos los Meses</option>
+                @if(isset($periodosDisponibles))
+                    @foreach($periodosDisponibles as $periodo)
+                        @php 
+                            $val = $periodo->month . '-' . $periodo->year; 
+                            $selected = ($filtroMes == $periodo->month && $filtroAnio == $periodo->year) ? 'selected' : '';
+                        @endphp
+                        <option value="{{ $val }}" {{ $selected }}>{{ $mesesEspanol[$periodo->month] ?? '' }} {{ $periodo->year }}</option>
+                    @endforeach
+                @endif
+            </select>
+        </form>
+        <span class="text-muted d-none d-sm-inline">{{ now()->translatedFormat('d \d\e F, Y') }}</span>
+    </div>
 </div>
 
+<script>
+function applyFilter(val) {
+    if(!val) {
+        window.location.href = "{{ url('/dashboard') }}";
+        return;
+    }
+    const parts = val.split('-');
+    window.location.href = "{{ url('/dashboard') }}?month=" + parts[0] + "&year=" + parts[1];
+}
+</script>
+
 <div class="row g-4 mb-4">
-    <div class="col-md-3">
+    <div class="col-sm-6 col-lg">
         <div class="card kpi-card">
             <div class="card-body d-flex align-items-center justify-content-between">
                 <div>
@@ -19,7 +46,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-sm-6 col-lg">
         <div class="card kpi-card blue-edge">
             <div class="card-body d-flex align-items-center justify-content-between">
                 <div>
@@ -30,23 +57,34 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-sm-6 col-lg">
+        <div class="card kpi-card border-success" style="border-left: 4px solid #198754 !important;">
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-muted mb-1">Planillas Aprobadas</h6>
+                    <h3 class="mb-0 fw-bold">{{ $planillasAprobadas ?? 0 }}</h3>
+                </div>
+                <i class="fa fa-check-double kpi-icon text-success"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg">
         <div class="card kpi-card yellow-edge">
             <div class="card-body d-flex align-items-center justify-content-between">
                 <div>
                     <h6 class="text-muted mb-1">Total Deducciones</h6>
-                    <h3 class="mb-0 fw-bold">L. {{ number_format($totalDeducciones ?? 0, 2) }}</h3>
+                    <h3 class="mb-0 fw-bold fs-5">L. {{ number_format($totalDeducciones ?? 0, 2) }}</h3>
                 </div>
                 <i class="fa fa-hand-holding-usd kpi-icon text-warning"></i>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-sm-6 col-lg">
         <div class="card kpi-card">
             <div class="card-body d-flex align-items-center justify-content-between">
                 <div>
                     <h6 class="text-muted mb-1">Total Neto</h6>
-                    <h3 class="mb-0 fw-bold">L. {{ number_format($netoMensual ?? 0, 2) }}</h3>
+                    <h3 class="mb-0 fw-bold fs-5">L. {{ number_format($netoMensual ?? 0, 2) }}</h3>
                 </div>
                 <i class="fa fa-money-bill-wave kpi-icon text-success"></i>
             </div>
@@ -85,7 +123,7 @@
                                 </td>
                                 <td>L. {{ number_format($p->details->sum('net_salary'), 2) }}</td>
                                 <td>
-                                    <a href="#" class="btn btn-sm btn-theme"><i class="fa fa-eye"></i></a>
+                                    <a href="{{ url('/planillas/' . $p->id) }}" class="btn btn-sm btn-theme text-white border-0"><i class="fa fa-eye"></i></a>
                                 </td>
                             </tr>
                             @empty

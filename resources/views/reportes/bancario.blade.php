@@ -22,7 +22,8 @@
         <button onclick="window.close()" class="btn btn-secondary">Cerrar</button>
     </div>
 
-    <div class="report-header">
+    <div class="report-header" style="position: relative;">
+        <img src="{{ asset('img/logo.png') }}" style="max-height: 2cm; max-width: 2cm; position: absolute; left: 0; top: 0;">
         <h2 class="mb-1 fw-bold">{{ \App\Models\Setting::where('key','institution_name')->first()->value ?? 'Instituto Sagrado Corazón' }}</h2>
         <div class="mb-4 d-flex justify-content-between align-items-end">
         <div>

@@ -76,9 +76,14 @@
         @endif
     </div>
     
-    <div class="d-none d-print-block text-center mt-3 mb-4">
-        <h4>{{ \App\Models\Setting::where('key','institution_name')->first()->value ?? 'Liceo Hondureño' }}</h4>
-        <h5>Planilla de {{ $planilla->level->name }} - {{ $planilla->period_name }}</h5>
+    <div class="d-none d-print-block mt-3 mb-4 position-relative">
+        <div class="position-absolute" style="left: 0; top: 0;">
+            <img src="{{ asset('img/logo.png') }}" style="max-height: 2cm; max-width: 2cm;">
+        </div>
+        <div class="text-center w-100">
+            <h4>{{ \App\Models\Setting::where('key','institution_name')->first()->value ?? 'Liceo Hondureño' }}</h4>
+            <h5>Planilla de {{ $planilla->level->name }} - {{ $planilla->period_name }}</h5>
+        </div>
     </div>
 
     <div class="card-body p-0">
@@ -102,7 +107,13 @@
                     </thead>
                     <tbody>
                         @php $counter = 1; @endphp
-                        @foreach($planilla->details->sortBy(function($d) { return $d->employee->first_name . ' ' . $d->employee->last_name; }) as $detail)
+                        @foreach($planilla->details->sortBy(function($d) { 
+                            $prefix = '';
+                            if ($d->employee->support_category === 'Administración') $prefix = '1_';
+                            elseif ($d->employee->support_category === 'Apoyo') $prefix = '2_';
+                            else $prefix = '3_';
+                            return $prefix . $d->employee->first_name . ' ' . $d->employee->last_name; 
+                        }) as $detail)
                         <tr class="align-middle">
                             <td class="text-center px-1" style="width: 1%; white-space: nowrap;">{{ $counter++ }}</td>
                             <td class="text-center d-print-none">{{ $detail->employee->dni }}</td>
@@ -156,12 +167,10 @@
     <div class="d-none d-print-block mt-5 pt-5 pb-5">
         <div class="row">
             <div class="col-6 text-center">
-                <hr class="mx-auto" style="width: 70%; border-top: 1px solid #000; opacity: 1;">
-                <p>{{ \App\Models\Setting::where('key','signature_accountant')->first()->value ?? 'Lic. Contadora' }}<br>Aprobación Financiera</p>
+                <div style="font-weight: bold; font-size: 14px;">APROBADO POR <span style="display:inline-block; width: 220px; border-bottom: 1px solid #000; margin-left: 10px;"></span></div>
             </div>
             <div class="col-6 text-center">
-                <hr class="mx-auto" style="width: 70%; border-top: 1px solid #000; opacity: 1;">
-                <p>{{ \App\Models\Setting::where('key','signature_religious')->first()->value ?? 'Sor Directora' }}<br>Autorización General</p>
+                <div style="font-weight: bold; font-size: 14px;">AUTORIZADO POR <span style="display:inline-block; width: 220px; border-bottom: 1px solid #000; margin-left: 10px;"></span></div>
             </div>
         </div>
     </div>

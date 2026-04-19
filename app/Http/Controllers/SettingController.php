@@ -38,9 +38,17 @@ class SettingController extends Controller
             mkdir(storage_path('app/backups'), 0755, true);
         }
 
-        $mysqldumpPath = 'E:\xampp\mysql\bin\mysqldump.exe';
-        if (!file_exists($mysqldumpPath)) {
-            $mysqldumpPath = 'mysqldump'; // Fallback a PATH si no se encuentra
+        $possiblePaths = [
+            'E:\xampp\mysql\bin\mysqldump.exe',
+            'C:\xampp\mysql\bin\mysqldump.exe'
+        ];
+        
+        $mysqldumpPath = 'mysqldump'; // Fallback a PATH si no se encuentra
+        foreach ($possiblePaths as $testPath) {
+            if (file_exists($testPath)) {
+                $mysqldumpPath = '"' . $testPath . '"'; // Envolver en comillas para evitar problemas con espacios si aplicara
+                break;
+            }
         }
 
         $passString = $password ? "-p{$password}" : ''; 
@@ -54,7 +62,8 @@ class SettingController extends Controller
                 'Content-Type' => 'application/sql',
             ])->deleteFileAfterSend(true);
         } else {
-            return back()->with('error', 'Falló la creación del respaldo. Verifica que XAMPP MySQL esté corriendo y mysqldump sea accesible.');
+            $errorDetails = empty($output) ? 'No hay detalles. (Verifica si el cliente mysqldump está instalado)' : implode("\n", $output);
+            return back()->with('error', 'Falló la creación del respaldo. Detalles del error: ' . $errorDetails);
         }
     }
 
@@ -76,9 +85,17 @@ class SettingController extends Controller
         $tempPath = storage_path('app/temp_restore_' . time() . '.sql');
         move_uploaded_file($file->getRealPath(), $tempPath);
 
-        $mysqlPath = 'E:\xampp\mysql\bin\mysql.exe';
-        if (!file_exists($mysqlPath)) {
-            $mysqlPath = 'mysql'; // Fallback
+        $possiblePaths = [
+            'E:\xampp\mysql\bin\mysql.exe',
+            'C:\xampp\mysql\bin\mysql.exe'
+        ];
+        
+        $mysqlPath = 'mysql'; // Fallback
+        foreach ($possiblePaths as $testPath) {
+            if (file_exists($testPath)) {
+                $mysqlPath = '"' . $testPath . '"';
+                break;
+            }
         }
 
         $passString = $password ? "-p{$password}" : ''; 

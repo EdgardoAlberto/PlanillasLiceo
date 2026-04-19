@@ -16,6 +16,7 @@ services:
       # Fuerzas ciertas variables para producción, aunque leera del .env también.
       - APP_ENV=production
       - APP_DEBUG=false
+      - DB_HOST=db
     env_file:
       - .env
     volumes:

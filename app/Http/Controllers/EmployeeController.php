@@ -40,6 +40,7 @@ class EmployeeController extends Controller
             'phone' => 'nullable',
             'status' => 'required|in:Activo,Inactivo',
             'hire_date' => 'nullable|date',
+            'support_category' => 'nullable|in:Administración,Apoyo',
         ]);
 
         Employee::create($data);
@@ -70,6 +71,7 @@ class EmployeeController extends Controller
             'phone' => 'nullable',
             'status' => 'required|in:Activo,Inactivo',
             'hire_date' => 'nullable|date',
+            'support_category' => 'nullable|in:Administración,Apoyo',
         ]);
 
         $empleado->update($data);
