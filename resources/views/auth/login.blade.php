@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/admin.css" rel="stylesheet">
     <style>
-        body { background: #112D4E; display: flex; align-items: center; min-height: 100vh; }
-        .login-card { border-radius: 10px; border-top: 5px solid #198754; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        body {
+            background: #112D4E;
+            display: flex;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-card {
+            border-radius: 10px;
+            border-top: 5px solid #198754;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="row justify-content-center">
@@ -42,4 +54,5 @@
         </div>
     </div>
 </body>
+
 </html>

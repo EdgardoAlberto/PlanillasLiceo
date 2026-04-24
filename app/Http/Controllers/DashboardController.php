@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         $mesesEspanol = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
         $filtroMes = $request->get('month');
@@ -22,7 +23,7 @@ class DashboardController extends Controller
             ->get();
 
         $totalEmpleados = Employee::where('status', 'Activo')->count();
-        
+
         $queryPlanillasActivas = Payroll::whereIn('status', ['Borrador', 'Revisada']);
         $queryPlanillasAprobadas = Payroll::where('status', 'Aprobada');
         $queryDeducciones = PayrollDetail::query();
@@ -31,7 +32,7 @@ class DashboardController extends Controller
         if ($filtroMes && $filtroAnio) {
             $queryPlanillasActivas->where('month', $filtroMes)->where('year', $filtroAnio);
             $queryPlanillasAprobadas->where('month', $filtroMes)->where('year', $filtroAnio);
-            
+
             $payrollIds = Payroll::where('month', $filtroMes)->where('year', $filtroAnio)->pluck('id');
             $queryDeducciones->whereIn('payroll_id', $payrollIds);
             $queryNeto->whereIn('payroll_id', $payrollIds);
@@ -49,7 +50,16 @@ class DashboardController extends Controller
         $ultimasPlanillas = $ultimasPlanillasQuery->orderBy('id', 'desc')->take(5)->get();
 
         return view('dashboard', compact(
-            'totalEmpleados', 'planillasActivas', 'planillasAprobadas', 'totalDeducciones', 'netoMensual', 'ultimasPlanillas', 'periodosDisponibles', 'mesesEspanol', 'filtroMes', 'filtroAnio'
+            'totalEmpleados',
+            'planillasActivas',
+            'planillasAprobadas',
+            'totalDeducciones',
+            'netoMensual',
+            'ultimasPlanillas',
+            'periodosDisponibles',
+            'mesesEspanol',
+            'filtroMes',
+            'filtroAnio'
         ));
     }
 }
