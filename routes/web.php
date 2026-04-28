@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/planillas/{planilla}/vouchers', [PayrollController::class, 'vouchers']);
         Route::post('/planillas/{planilla}/deducciones', [PayrollController::class, 'updateDeductions']);
         Route::post('/planillas/{planilla}/estado', [PayrollController::class, 'cambiarEstado']);
+        Route::delete('/planillas/{planilla}/detalle/{detalle}', [PayrollController::class, 'removeDetail']);
 
         // Reportes
         Route::get('/reportes', [ReportController::class, 'index']);

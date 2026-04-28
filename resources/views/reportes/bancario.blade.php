@@ -57,12 +57,12 @@
             @php $totalMonto += $det->net_salary; @endphp
             @endforeach
         </tbody>
-        <tfoot class="table-dark">
-            <tr>
+        <tbody>
+            <tr class="table-dark">
                 <td colspan="4" class="text-end fw-bold">Total de Planilla:</td>
                 <td class="text-end fw-bold fs-5">L. {{ number_format($totalMonto, 2) }}</td>
             </tr>
-        </tfoot>
+        </tbody>
     </table>
 
     <div class="mt-5 pt-5 text-center">

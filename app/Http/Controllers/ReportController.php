@@ -37,7 +37,43 @@ class ReportController extends Controller
             ->with(['employee.level'])
             ->get()
             ->sortBy(function($detail) {
-                return $detail->employee->first_name . ' ' . $detail->employee->last_name;
+                $rawLevelName = $detail->employee->level->name ?? '';
+                $levelName = mb_strtolower($rawLevelName, 'UTF-8');
+                $levelName = str_replace(
+                    ['á', 'é', 'í', 'ó', 'ú', 'ñ'],
+                    ['a', 'e', 'i', 'o', 'u', 'n'],
+                    $levelName
+                );
+                
+                $order = 6; // Por defecto al final si no coincide
+
+                if (str_contains($levelName, 'administracion') || str_contains($levelName, 'apoyo')) {
+                    $cat = mb_strtolower($detail->employee->support_category ?? '', 'UTF-8');
+                    $cat = str_replace(['á', 'é', 'í', 'ó', 'ú', 'ñ'], ['a', 'e', 'i', 'o', 'u', 'n'], $cat);
+                    
+                    if (str_contains($cat, 'apoyo')) {
+                        $order = 2;
+                    } elseif (str_contains($cat, 'admin')) {
+                        $order = 1;
+                    } else {
+                        // Si no hay categoría, o no coincide, usamos el nombre del nivel
+                        if (str_contains($levelName, 'administracion') && !str_contains($levelName, 'apoyo')) {
+                            $order = 1;
+                        } elseif (str_contains($levelName, 'apoyo') && !str_contains($levelName, 'administracion')) {
+                            $order = 2;
+                        } else {
+                            $order = 1; // Por defecto a 1 si es un nivel combinado pero no tiene categoría
+                        }
+                    }
+                } elseif (str_contains($levelName, 'prebasica') || str_contains($levelName, 'pre-basica')) {
+                    $order = 3;
+                } elseif (str_contains($levelName, 'basica') || str_contains($levelName, 'primaria')) {
+                    $order = 4;
+                } elseif (str_contains($levelName, 'secundaria') || str_contains($levelName, 'media')) {
+                    $order = 5;
+                }
+
+                return sprintf('%d-%s %s', $order, $detail->employee->first_name, $detail->employee->last_name);
             })->values();
 
         return view('reportes.bancario', compact('details', 'month', 'year'));

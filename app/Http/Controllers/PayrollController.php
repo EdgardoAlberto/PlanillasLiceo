@@ -200,4 +200,22 @@ class PayrollController extends Controller
         $deductionsList = $planilla->level->deductionTypes()->orderBy('sort_order')->get();
         return view('planillas.vouchers', compact('planilla', 'deductionsList'));
     }
+
+    public function removeDetail(Payroll $planilla, PayrollDetail $detalle)
+    {
+        if ($planilla->status !== 'Borrador') {
+            return back()->with('error', 'Solo se pueden remover empleados de planillas en estado Borrador.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $detalle->deductions()->delete();
+            $detalle->delete();
+            DB::commit();
+            return back()->with('success', 'Empleado removido de la planilla correctamente.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Error al remover empleado: ' . $e->getMessage());
+        }
+    }
 }

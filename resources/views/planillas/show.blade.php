@@ -117,7 +117,12 @@
                         <tr class="align-middle">
                             <td class="text-center px-1" style="width: 1%; white-space: nowrap;">{{ $counter++ }}</td>
                             <td class="text-center d-print-none">{{ $detail->employee->dni }}</td>
-                            <td class="text-start"><strong>{{ $detail->employee->first_name }}</strong> {{ $detail->employee->last_name }}</td>
+                            <td class="text-start">
+                                <strong>{{ $detail->employee->first_name }}</strong> {{ $detail->employee->last_name }}
+                                @if($planilla->status == 'Borrador')
+                                    <button type="button" class="btn btn-sm text-danger border-0 p-0 ms-2 d-print-none" onclick="deleteDetail('{{ url('/planillas/'.$planilla->id.'/detalle/'.$detail->id) }}')" title="Remover empleado de esta planilla"><i class="fa fa-times-circle"></i></button>
+                                @endif
+                            </td>
                             <td class="text-end px-1">L. {{ number_format($detail->base_salary, 2) }}</td>
                             
                             @foreach($deductionsList as $dType)
@@ -175,6 +180,21 @@
         </div>
     </div>
 </div>
+
+<form id="delete-detail-form" method="POST" action="" style="display:none;">
+    @csrf
+    @method('DELETE')
+</form>
+
+<script>
+function deleteDetail(url) {
+    if(confirm('¿Está seguro de remover a este empleado únicamente de esta planilla?\n\n(Esto no borra al empleado del sistema, solo lo quita de este pago en borrador).')) {
+        let f = document.getElementById('delete-detail-form');
+        f.action = url;
+        f.submit();
+    }
+}
+</script>
 
 <style>
     /* Estilos globales para la planilla (Pantalla y Reporte) */
