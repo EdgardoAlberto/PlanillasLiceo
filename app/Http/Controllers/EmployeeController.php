@@ -75,6 +75,20 @@ class EmployeeController extends Controller
         ]);
 
         $empleado->update($data);
+
+        // Actualizar salarios en planillas borrador
+        $draftDetails = \App\Models\PayrollDetail::where('employee_id', $empleado->id)
+            ->whereHas('payroll', function($q) {
+                $q->where('status', 'Borrador');
+            })->get();
+
+        foreach ($draftDetails as $detail) {
+            $detail->update([
+                'base_salary' => $empleado->base_salary,
+                'net_salary' => $empleado->base_salary - $detail->total_deductions
+            ]);
+        }
+
         return redirect('/empleados')->with('success', 'Datos del empleado actualizados.');
     }
 

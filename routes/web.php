@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('planillas', PayrollController::class)->except(['edit', 'update', 'destroy']);
         Route::get('/planillas/{planilla}/vouchers', [PayrollController::class, 'vouchers']);
         Route::post('/planillas/{planilla}/deducciones', [PayrollController::class, 'updateDeductions']);
+        Route::post('/planillas/{planilla}/sync-salarios', [PayrollController::class, 'syncSalaries']);
         Route::post('/planillas/{planilla}/estado', [PayrollController::class, 'cambiarEstado']);
         Route::delete('/planillas/{planilla}/detalle/{detalle}', [PayrollController::class, 'removeDetail']);
 

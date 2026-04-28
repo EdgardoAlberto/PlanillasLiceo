@@ -72,7 +72,13 @@
     <div class="card-header bg-white p-3 border-0 d-flex justify-content-between align-items-center d-print-none">
         <h6 class="m-0 fw-bold">Desglose General</h6>
         @if($planilla->status == 'Borrador')
-        <button form="form-deducciones" type="submit" class="btn btn-sm btn-warning-theme"><i class="fa fa-save"></i> Guardar Deducciones</button>
+        <div>
+            <form action="{{ url('/planillas/'.$planilla->id.'/sync-salarios') }}" method="POST" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-info me-2" onclick="return confirm('¿Actualizar los salarios base de esta planilla con los valores actuales de los empleados?');"><i class="fa fa-sync"></i> Sincronizar Salarios</button>
+            </form>
+            <button form="form-deducciones" type="submit" class="btn btn-sm btn-warning-theme"><i class="fa fa-save"></i> Guardar Deducciones</button>
+        </div>
         @endif
     </div>
     

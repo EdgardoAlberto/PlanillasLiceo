@@ -45,17 +45,47 @@
             </tr>
         </thead>
         <tbody>
-            @php $totalMonto = 0; @endphp
+            @php 
+                $totalMonto = 0; 
+                $currentGroup = null;
+                $groupTotal = 0;
+            @endphp
             @foreach($details as $idx => $det)
-            <tr class="align-middle">
-                <td class="text-center">{{ $idx + 1 }}</td>
-                <td><strong>{{ $det->employee->first_name }}</strong> {{ $det->employee->last_name }}</td>
-                <td class="text-center">{{ $det->employee->dni }}</td>
-                <td class="text-center">{{ $det->employee->bank_account }}</td>
-                <td class="text-end fw-bold">L. {{ number_format($det->net_salary, 2) }}</td>
-            </tr>
-            @php $totalMonto += $det->net_salary; @endphp
+                @if($currentGroup !== $det->group_name)
+                    @if($currentGroup !== null)
+                        <tr class="table-secondary">
+                            <td colspan="4" class="text-end fw-bold">Subtotal {{ $currentGroup }}:</td>
+                            <td class="text-end fw-bold">L. {{ number_format($groupTotal, 2) }}</td>
+                        </tr>
+                    @endif
+                    @php 
+                        $currentGroup = $det->group_name; 
+                        $groupTotal = 0;
+                    @endphp
+                    <tr>
+                        <td colspan="5" class="bg-light fw-bold text-primary">{{ $currentGroup }}</td>
+                    </tr>
+                @endif
+
+                <tr class="align-middle">
+                    <td class="text-center">{{ $idx + 1 }}</td>
+                    <td><strong>{{ $det->employee->first_name }}</strong> {{ $det->employee->last_name }}</td>
+                    <td class="text-center">{{ $det->employee->dni }}</td>
+                    <td class="text-center">{{ $det->employee->bank_account }}</td>
+                    <td class="text-end fw-bold">L. {{ number_format($det->net_salary, 2) }}</td>
+                </tr>
+                @php 
+                    $totalMonto += $det->net_salary; 
+                    $groupTotal += $det->net_salary;
+                @endphp
             @endforeach
+            
+            @if($currentGroup !== null)
+                <tr class="table-secondary">
+                    <td colspan="4" class="text-end fw-bold">Subtotal {{ $currentGroup }}:</td>
+                    <td class="text-end fw-bold">L. {{ number_format($groupTotal, 2) }}</td>
+                </tr>
+            @endif
         </tbody>
         <tbody>
             <tr class="table-dark">

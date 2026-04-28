@@ -36,7 +36,7 @@ class ReportController extends Controller
         $details = PayrollDetail::whereIn('payroll_id', $payrolls)
             ->with(['employee.level'])
             ->get()
-            ->sortBy(function($detail) {
+            ->map(function($detail) {
                 $rawLevelName = $detail->employee->level->name ?? '';
                 $levelName = mb_strtolower($rawLevelName, 'UTF-8');
                 $levelName = str_replace(
@@ -45,35 +45,48 @@ class ReportController extends Controller
                     $levelName
                 );
                 
-                $order = 6; // Por defecto al final si no coincide
+                $order = 6;
+                $groupName = 'Otros Niveles';
 
-                if (str_contains($levelName, 'administracion') || str_contains($levelName, 'apoyo')) {
+                if (str_contains($levelName, 'admin') || str_contains($levelName, 'apoyo')) {
                     $cat = mb_strtolower($detail->employee->support_category ?? '', 'UTF-8');
                     $cat = str_replace(['á', 'é', 'í', 'ó', 'ú', 'ñ'], ['a', 'e', 'i', 'o', 'u', 'n'], $cat);
                     
                     if (str_contains($cat, 'apoyo')) {
                         $order = 2;
+                        $groupName = 'Personal de Apoyo';
                     } elseif (str_contains($cat, 'admin')) {
                         $order = 1;
+                        $groupName = 'Personal Administrativo';
                     } else {
-                        // Si no hay categoría, o no coincide, usamos el nombre del nivel
-                        if (str_contains($levelName, 'administracion') && !str_contains($levelName, 'apoyo')) {
+                        if (str_contains($levelName, 'admin') && !str_contains($levelName, 'apoyo')) {
                             $order = 1;
-                        } elseif (str_contains($levelName, 'apoyo') && !str_contains($levelName, 'administracion')) {
+                            $groupName = 'Personal Administrativo';
+                        } elseif (str_contains($levelName, 'apoyo') && !str_contains($levelName, 'admin')) {
                             $order = 2;
+                            $groupName = 'Personal de Apoyo';
                         } else {
-                            $order = 1; // Por defecto a 1 si es un nivel combinado pero no tiene categoría
+                            $order = 1;
+                            $groupName = 'Personal Administrativo';
                         }
                     }
                 } elseif (str_contains($levelName, 'prebasica') || str_contains($levelName, 'pre-basica')) {
                     $order = 3;
+                    $groupName = 'Nivel Pre-Básica';
                 } elseif (str_contains($levelName, 'basica') || str_contains($levelName, 'primaria')) {
                     $order = 4;
+                    $groupName = 'Nivel Básica';
                 } elseif (str_contains($levelName, 'secundaria') || str_contains($levelName, 'media')) {
                     $order = 5;
+                    $groupName = 'Nivel Media';
                 }
 
-                return sprintf('%d-%s %s', $order, $detail->employee->first_name, $detail->employee->last_name);
+                $detail->group_order = $order;
+                $detail->group_name = $groupName;
+                return $detail;
+            })
+            ->sortBy(function($detail) {
+                return sprintf('%d-%s %s', $detail->group_order, $detail->employee->first_name, $detail->employee->last_name);
             })->values();
 
         return view('reportes.bancario', compact('details', 'month', 'year'));

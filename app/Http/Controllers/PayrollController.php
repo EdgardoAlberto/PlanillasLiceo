@@ -218,4 +218,27 @@ class PayrollController extends Controller
             return back()->with('error', 'Error al remover empleado: ' . $e->getMessage());
         }
     }
+
+    public function syncSalaries(Payroll $planilla)
+    {
+        if ($planilla->status !== 'Borrador') {
+            return back()->with('error', 'Solo se pueden sincronizar salarios en planillas en estado Borrador.');
+        }
+
+        DB::beginTransaction();
+        try {
+            foreach ($planilla->details as $detail) {
+                $newBaseSalary = $detail->employee->base_salary;
+                $detail->update([
+                    'base_salary' => $newBaseSalary,
+                    'net_salary' => $newBaseSalary - $detail->total_deductions
+                ]);
+            }
+            DB::commit();
+            return back()->with('success', 'Salarios base sincronizados con el registro de empleados exitosamente.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Error al sincronizar salarios: ' . $e->getMessage());
+        }
+    }
 }
