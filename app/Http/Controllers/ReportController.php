@@ -89,7 +89,8 @@ class ReportController extends Controller
                 return sprintf('%d-%s %s', $detail->group_order, $detail->employee->first_name, $detail->employee->last_name);
             })->values();
 
-        return view('reportes.bancario', compact('details', 'month', 'year'));
+        $tipo = $request->get('tipo', 'detallado');
+        return view('reportes.bancario', compact('details', 'month', 'year', 'tipo'));
     }
 
     public function historico(Request $request)

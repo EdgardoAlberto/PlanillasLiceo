@@ -75,7 +75,7 @@
         <div>
             <form action="{{ url('/planillas/'.$planilla->id.'/sync-salarios') }}" method="POST" class="d-inline">
                 @csrf
-                <button type="submit" class="btn btn-sm btn-info me-2" onclick="return confirm('¿Actualizar los salarios base de esta planilla con los valores actuales de los empleados?');"><i class="fa fa-sync"></i> Sincronizar Salarios</button>
+                <button type="submit" class="btn btn-sm btn-info me-2" onclick="return confirm('¿Actualizar los salarios base y agregar nuevos empleados a esta planilla?');"><i class="fa fa-sync"></i> Sincronizar Planilla</button>
             </form>
             <button form="form-deducciones" type="submit" class="btn btn-sm btn-warning-theme"><i class="fa fa-save"></i> Guardar Deducciones</button>
         </div>
@@ -124,7 +124,7 @@
                             <td class="text-center px-1" style="width: 1%; white-space: nowrap;">{{ $counter++ }}</td>
                             <td class="text-center d-print-none">{{ $detail->employee->dni }}</td>
                             <td class="text-start">
-                                <strong>{{ $detail->employee->first_name }}</strong> {{ $detail->employee->last_name }}
+                                {{ $detail->employee->first_name }} {{ $detail->employee->last_name }}
                                 @if($planilla->status == 'Borrador')
                                     <button type="button" class="btn btn-sm text-danger border-0 p-0 ms-2 d-print-none" onclick="deleteDetail('{{ url('/planillas/'.$planilla->id.'/detalle/'.$detail->id) }}')" title="Remover empleado de esta planilla"><i class="fa fa-times-circle"></i></button>
                                 @endif

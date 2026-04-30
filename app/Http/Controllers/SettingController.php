@@ -39,30 +39,36 @@ class SettingController extends Controller
         }
 
         $possiblePaths = [
+            'mysqldump',
+            '/usr/bin/mysqldump',
             'E:\xampp\mysql\bin\mysqldump.exe',
             'C:\xampp\mysql\bin\mysqldump.exe'
         ];
         
-        $mysqldumpPath = 'mysqldump'; // Fallback a PATH si no se encuentra
+        $mysqldumpPath = 'mysqldump'; 
         foreach ($possiblePaths as $testPath) {
-            if (file_exists($testPath)) {
-                $mysqldumpPath = '"' . $testPath . '"'; // Envolver en comillas para evitar problemas con espacios si aplicara
+            if ($testPath !== 'mysqldump' && file_exists($testPath)) {
+                $mysqldumpPath = '"' . $testPath . '"';
                 break;
             }
         }
 
-        $passString = $password ? "-p{$password}" : ''; 
+        // Pasamos la contraseña por variable de entorno para evitar problemas con caracteres especiales (ej. $) en bash
+        putenv("MYSQL_PWD={$password}");
         
-        $command = "\"{$mysqldumpPath}\" --user={$userName} {$passString} --host={$host} --port={$port} {$dbName} > \"{$path}\"";
+        $command = "{$mysqldumpPath} --user=\"{$userName}\" --host=\"{$host}\" --port=\"{$port}\" \"{$dbName}\" > \"{$path}\" 2>&1";
         
         exec($command, $output, $returnVar);
+        
+        // Limpiamos la variable de entorno por seguridad
+        putenv("MYSQL_PWD");
 
         if ($returnVar === 0 && file_exists($path)) {
             return response()->download($path, $filename, [
                 'Content-Type' => 'application/sql',
             ])->deleteFileAfterSend(true);
         } else {
-            $errorDetails = empty($output) ? 'No hay detalles. (Verifica si el cliente mysqldump está instalado)' : implode("\n", $output);
+            $errorDetails = empty($output) ? "Código {$returnVar}. Verifica si el cliente mysqldump está instalado." : implode("\n", $output);
             return back()->with('error', 'Falló la creación del respaldo. Detalles del error: ' . $errorDetails);
         }
     }
@@ -86,23 +92,27 @@ class SettingController extends Controller
         move_uploaded_file($file->getRealPath(), $tempPath);
 
         $possiblePaths = [
+            'mysql',
+            '/usr/bin/mysql',
             'E:\xampp\mysql\bin\mysql.exe',
             'C:\xampp\mysql\bin\mysql.exe'
         ];
         
-        $mysqlPath = 'mysql'; // Fallback
+        $mysqlPath = 'mysql';
         foreach ($possiblePaths as $testPath) {
-            if (file_exists($testPath)) {
+            if ($testPath !== 'mysql' && file_exists($testPath)) {
                 $mysqlPath = '"' . $testPath . '"';
                 break;
             }
         }
 
-        $passString = $password ? "-p{$password}" : ''; 
+        putenv("MYSQL_PWD={$password}");
         
-        $command = "\"{$mysqlPath}\" --user={$userName} {$passString} --host={$host} --port={$port} {$dbName} < \"{$tempPath}\"";
+        $command = "{$mysqlPath} --user=\"{$userName}\" --host=\"{$host}\" --port=\"{$port}\" \"{$dbName}\" < \"{$tempPath}\" 2>&1";
         
         exec($command, $output, $returnVar);
+        
+        putenv("MYSQL_PWD");
         
         // Limpiamos el archivo temporal que subió el usuario por seguridad
         if (file_exists($tempPath)) {
@@ -112,7 +122,8 @@ class SettingController extends Controller
         if ($returnVar === 0) {
             return back()->with('success', 'La base de datos se ha restaurado correctamente. Tus datos están listos.');
         } else {
-            return back()->with('error', 'Hubo un problema al importar la base de datos. Código de error interno: ' . $returnVar);
+            $errorDetails = empty($output) ? "Código {$returnVar}." : implode("\n", $output);
+            return back()->with('error', 'Hubo un problema al importar la base de datos. Detalles: ' . $errorDetails);
         }
     }
 }

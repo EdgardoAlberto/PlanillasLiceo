@@ -227,6 +227,7 @@ class PayrollController extends Controller
 
         DB::beginTransaction();
         try {
+            // Actualizar salarios de empleados existentes
             foreach ($planilla->details as $detail) {
                 $newBaseSalary = $detail->employee->base_salary;
                 $detail->update([
@@ -234,11 +235,84 @@ class PayrollController extends Controller
                     'net_salary' => $newBaseSalary - $detail->total_deductions
                 ]);
             }
+
+            // Agregar nuevos empleados que falten
+            $empleados = Employee::where('level_id', $planilla->level_id)->where('status', 'Activo')->get();
+            $existingEmployeeIds = $planilla->details->pluck('employee_id')->toArray();
+            
+            $currentDate = Carbon::createFromDate($planilla->year, $planilla->month, 1);
+            $prevDate = $currentDate->copy()->subMonth();
+            $prevPayroll = Payroll::where('month', $prevDate->month)
+                ->where('year', $prevDate->year)
+                ->where('level_id', $planilla->level_id)
+                ->first();
+
+            $newAdded = 0;
+
+            foreach ($empleados as $emp) {
+                if (!in_array($emp->id, $existingEmployeeIds)) {
+                    $detail = PayrollDetail::create([
+                        'payroll_id' => $planilla->id,
+                        'employee_id' => $emp->id,
+                        'base_salary' => $emp->base_salary,
+                        'total_deductions' => 0,
+                        'net_salary' => $emp->base_salary
+                    ]);
+
+                    $totalDeductions = 0;
+
+                    if ($prevPayroll) {
+                        $prevDetail = PayrollDetail::where('payroll_id', $prevPayroll->id)->where('employee_id', $emp->id)->first();
+                        if ($prevDetail) {
+                            foreach ($prevDetail->deductions as $prevDed) {
+                                PayrollDetailDeduction::create([
+                                    'payroll_detail_id' => $detail->id,
+                                    'deduction_type_id' => $prevDed->deduction_type_id,
+                                    'amount' => $prevDed->amount
+                                ]);
+                                $totalDeductions += $prevDed->amount;
+                            }
+                        } else {
+                            $deductionsTypeIds = DB::table('deduction_type_payroll_level')
+                                ->where('payroll_level_id', $planilla->level_id)->pluck('deduction_type_id');
+                            foreach ($deductionsTypeIds as $dtype) {
+                                PayrollDetailDeduction::create([
+                                    'payroll_detail_id' => $detail->id,
+                                    'deduction_type_id' => $dtype,
+                                    'amount' => 0
+                                ]);
+                            }
+                        }
+                    } else {
+                        $deductionsTypeIds = DB::table('deduction_type_payroll_level')
+                            ->where('payroll_level_id', $planilla->level_id)->pluck('deduction_type_id');
+                        foreach ($deductionsTypeIds as $dtype) {
+                            PayrollDetailDeduction::create([
+                                'payroll_detail_id' => $detail->id,
+                                'deduction_type_id' => $dtype,
+                                'amount' => 0
+                            ]);
+                        }
+                    }
+
+                    $detail->update([
+                        'total_deductions' => $totalDeductions,
+                        'net_salary' => $detail->base_salary - $totalDeductions
+                    ]);
+
+                    $newAdded++;
+                }
+            }
+
             DB::commit();
-            return back()->with('success', 'Salarios base sincronizados con el registro de empleados exitosamente.');
+            $msg = 'Planilla sincronizada exitosamente.';
+            if ($newAdded > 0) {
+                $msg .= " Se agregaron $newAdded empleado(s) nuevo(s).";
+            }
+            return back()->with('success', $msg);
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Error al sincronizar salarios: ' . $e->getMessage());
+            return back()->with('error', 'Error al sincronizar planilla: ' . $e->getMessage());
         }
     }
 }

@@ -30,7 +30,8 @@
                             <input type="number" name="year" class="form-control" value="{{ date('Y') }}" required min="2020" max="2050">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-outline-primary w-100"><i class="fa fa-file-invoice text-primary me-1"></i> Generar Reporte</button>
+                    <button type="submit" name="tipo" value="detallado" class="btn btn-outline-primary w-100 mb-2"><i class="fa fa-file-invoice text-primary me-1"></i> Generar Reporte Detallado</button>
+                    <button type="submit" name="tipo" value="simple" class="btn btn-outline-info w-100"><i class="fa fa-list text-info me-1"></i> Generar Reporte Simple (Sin Subtotales)</button>
                 </form>
             </div>
         </div>

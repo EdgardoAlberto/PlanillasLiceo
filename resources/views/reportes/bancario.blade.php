@@ -27,7 +27,7 @@
         <h2 class="mb-1 fw-bold">{{ \App\Models\Setting::where('key','institution_name')->first()->value ?? 'Instituto Sagrado Corazón' }}</h2>
         <div class="mb-4 d-flex justify-content-between align-items-end">
         <div>
-            <h5 class="mb-0 text-secondary">Reporte General de Transferencias Bancarias</h5>
+            <h5 class="mb-0 text-secondary">Reporte General de Transferencias Bancarias {{ isset($tipo) && $tipo === 'simple' ? '(Sin Subtotales)' : '' }}</h5>
             <p class="mb-0"><strong>Período Aprobado:</strong> {{ ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][$month - 1] }} / {{ $year }}</p>
         </div>
         </div>
@@ -51,25 +51,27 @@
                 $groupTotal = 0;
             @endphp
             @foreach($details as $idx => $det)
-                @if($currentGroup !== $det->group_name)
-                    @if($currentGroup !== null)
-                        <tr class="table-secondary">
-                            <td colspan="4" class="text-end fw-bold">Subtotal {{ $currentGroup }}:</td>
-                            <td class="text-end fw-bold">L. {{ number_format($groupTotal, 2) }}</td>
+                @if(isset($tipo) && $tipo !== 'simple')
+                    @if($currentGroup !== $det->group_name)
+                        @if($currentGroup !== null)
+                            <tr class="table-secondary">
+                                <td colspan="4" class="text-end fw-bold">Subtotal {{ $currentGroup }}:</td>
+                                <td class="text-end fw-bold">L. {{ number_format($groupTotal, 2) }}</td>
+                            </tr>
+                        @endif
+                        @php 
+                            $currentGroup = $det->group_name; 
+                            $groupTotal = 0;
+                        @endphp
+                        <tr>
+                            <td colspan="5" class="bg-light fw-bold text-primary">{{ $currentGroup }}</td>
                         </tr>
                     @endif
-                    @php 
-                        $currentGroup = $det->group_name; 
-                        $groupTotal = 0;
-                    @endphp
-                    <tr>
-                        <td colspan="5" class="bg-light fw-bold text-primary">{{ $currentGroup }}</td>
-                    </tr>
                 @endif
 
                 <tr class="align-middle">
                     <td class="text-center">{{ $idx + 1 }}</td>
-                    <td><strong>{{ $det->employee->first_name }}</strong> {{ $det->employee->last_name }}</td>
+                    <td>{{ $det->employee->first_name }} {{ $det->employee->last_name }}</td>
                     <td class="text-center">{{ $det->employee->dni }}</td>
                     <td class="text-center">{{ $det->employee->bank_account }}</td>
                     <td class="text-end fw-bold">L. {{ number_format($det->net_salary, 2) }}</td>
@@ -80,7 +82,7 @@
                 @endphp
             @endforeach
             
-            @if($currentGroup !== null)
+            @if(isset($tipo) && $tipo !== 'simple' && $currentGroup !== null)
                 <tr class="table-secondary">
                     <td colspan="4" class="text-end fw-bold">Subtotal {{ $currentGroup }}:</td>
                     <td class="text-end fw-bold">L. {{ number_format($groupTotal, 2) }}</td>
